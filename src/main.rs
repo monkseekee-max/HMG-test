@@ -252,12 +252,14 @@ hmg init -g
 hmg doctor
 codex"#;
 
-const CODEX_MCP_CONFIG: &str = r#"[mcp_servers.hmg]
+const CODEX_MCP_CONFIG: &str = r#"# hmg:codex-mcp:start
+[mcp_servers.hmg]
 type = "stdio"
 command = "/home/USER/.local/bin/hmg-server"
 args = ["/home/USER/.local/share/hmg/codex-data"]
 startup_timeout_sec = 30
-env = { HMG_PROVIDER_BACKEND = "local" }"#;
+env = { HMG_PROVIDER_BACKEND = "local" }
+# hmg:codex-mcp:end"#;
 
 const PRODUCT_DOC_TOPICS: [ProductDocTopic; 8] = [
     ProductDocTopic {
@@ -265,18 +267,18 @@ const PRODUCT_DOC_TOPICS: [ProductDocTopic; 8] = [
         label: "01",
         title_zh: "安装与初始化",
         title_en: "Install and initialize",
-        summary_zh: "HMG 官网安装脚本会优先下载 GitHub Release 二进制；如果当前平台还没有预编译包，会回退到 cargo 从 GitHub 安装。",
-        summary_en: "The HMG installer prefers GitHub Release binaries and falls back to cargo install from GitHub when a prebuilt package is not available.",
+        summary_zh: "HMG 官网安装脚本会优先下载 funcode.xin 托管的预编译二进制；如果当前平台还没有预编译包，才回退到源码安装。",
+        summary_en: "The HMG installer prefers prebuilt binaries hosted on funcode.xin and only falls back to source installation when a platform package is unavailable.",
         bullets_zh: &[
             "安装后会提供 hmg、hmg-server、hmg-hook-worker 三个命令。",
             "hmg init 在当前目录 AGENTS.md 头部写入 HMG 自动记忆策略。",
-            "hmg init -g 写入 ~/.codex/AGENTS.md，让所有 Codex 工作区默认生效。",
+            "hmg init -g 写入 ~/.codex/AGENTS.md，并自动配置 ~/.codex/config.toml 的 HMG MCP。",
             "hmg doctor 用于验证命令、全局策略和 Codex MCP 配置是否就绪。",
         ],
         bullets_en: &[
             "Installation provides hmg, hmg-server, and hmg-hook-worker.",
             "hmg init writes the HMG memory policy into the current AGENTS.md.",
-            "hmg init -g writes ~/.codex/AGENTS.md so every Codex workspace can inherit it.",
+            "hmg init -g writes ~/.codex/AGENTS.md and automatically configures HMG MCP in ~/.codex/config.toml.",
             "hmg doctor verifies commands, global policy, and Codex MCP readiness.",
         ],
         code: QUICKSTART_CODE,
@@ -286,17 +288,19 @@ const PRODUCT_DOC_TOPICS: [ProductDocTopic; 8] = [
         label: "02",
         title_zh: "Codex MCP 配置",
         title_en: "Codex MCP configuration",
-        summary_zh: "Codex 通过 stdio MCP 启动 hmg-server。不要手动启动 HTTP 服务，也不要在 MCP args 里加 --http。",
-        summary_en: "Codex launches hmg-server through stdio MCP. Do not start an HTTP server manually and do not add --http to MCP args.",
+        summary_zh: "hmg init -g 会自动把 hmg-server 写进 Codex stdio MCP 配置。不要手动启动 HTTP 服务，也不要在 MCP args 里加 --http。",
+        summary_en: "hmg init -g automatically writes hmg-server into the Codex stdio MCP config. Do not start an HTTP server manually and do not add --http to MCP args.",
         bullets_zh: &[
-            "command 指向 hmg-server 的绝对路径。",
-            "args 是持久化数据目录，建议放在 ~/.local/share/hmg/codex-data。",
-            "HMG_PROVIDER_BACKEND=local 适合确定性本地 smoke；生产可切换为 openai、anthropic 或 compatible。",
+            "默认会刷新 marker 包裹的 [mcp_servers.hmg]，可重复运行。",
+            "command 指向已安装 hmg 同目录下的 hmg-server。",
+            "args 是持久化数据目录，默认 ~/.local/share/hmg/codex-data。",
+            "如果你手动维护 config.toml，可用 hmg init -g --no-codex-mcp。",
         ],
         bullets_en: &[
-            "command points to the absolute hmg-server path.",
-            "args is the persistent data directory, usually ~/.local/share/hmg/codex-data.",
-            "HMG_PROVIDER_BACKEND=local is deterministic for local smoke; production can use openai, anthropic, or compatible.",
+            "The marker-bounded [mcp_servers.hmg] block is refreshed idempotently.",
+            "command points to hmg-server next to the installed hmg binary.",
+            "args is the persistent data directory, defaulting to ~/.local/share/hmg/codex-data.",
+            "Use hmg init -g --no-codex-mcp if you maintain config.toml manually.",
         ],
         code: CODEX_MCP_CONFIG,
     },
