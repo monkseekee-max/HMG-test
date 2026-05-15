@@ -61,7 +61,14 @@ install_from_cargo() {
   fi
 
   log "Installing HMG from GitHub with cargo..."
-  cargo install --git "$GIT_URL" hmg-server --bins --force
+  cargo_root="$TMP_DIR/cargo-root"
+  CARGO_NET_GIT_FETCH_WITH_CLI=true cargo install --git "$GIT_URL" --root "$cargo_root" hmg-server --bins --force
+  mkdir -p "$BIN_DIR"
+  for bin in hmg hmg-server hmg-hook-worker; do
+    if [ -f "$cargo_root/bin/$bin" ]; then
+      install -m 0755 "$cargo_root/bin/$bin" "$BIN_DIR/$bin"
+    fi
+  done
 }
 
 main() {
