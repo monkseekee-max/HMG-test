@@ -77,6 +77,7 @@ install_from_cargo() {
   fi
 
   log "No prebuilt HMG binary was found for this platform. Falling back to source install."
+  log "Source install requires Rust and access to ${GIT_URL}."
   log "Installing HMG from GitHub with cargo..."
   cargo_root="$TMP_DIR/cargo-root"
   CARGO_NET_GIT_FETCH_WITH_CLI=true cargo install --git "$GIT_URL" --root "$cargo_root" hmg-server --bins --force
