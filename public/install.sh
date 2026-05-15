@@ -3,6 +3,8 @@ set -eu
 
 REPO="monkseekee-max/HMG"
 GIT_URL="https://github.com/${REPO}.git"
+HMG_RELEASE_BASE_URL="${HMG_RELEASE_BASE_URL:-https://funcode.xin/HMG/releases/latest/download}"
+GITHUB_RELEASE_BASE_URL="https://github.com/${REPO}/releases/latest/download"
 BIN_DIR="${HMG_INSTALL_DIR:-$HOME/.local/bin}"
 TMP_DIR="$(mktemp -d 2>/dev/null || mktemp -d -t hmg-install)"
 
@@ -31,17 +33,16 @@ target_triple() {
   esac
 }
 
-install_from_release() {
-  target="$(target_triple)"
-  [ -n "$target" ] || return 1
-  asset="hmg-${target}.tar.gz"
-  url="https://github.com/${REPO}/releases/latest/download/${asset}"
+install_from_release_url() {
+  asset="$1"
+  base_url="$2"
+  url="${base_url}/${asset}"
   if ! curl -fsI "$url" >/dev/null 2>&1; then
     return 1
   fi
 
-  log "Downloading HMG release: $asset"
-  curl -fsSL "$url" -o "$TMP_DIR/$asset"
+  log "Downloading HMG release: $url"
+  curl -fL --retry 3 --retry-delay 1 "$url" -o "$TMP_DIR/$asset"
   tar -xzf "$TMP_DIR/$asset" -C "$TMP_DIR"
   mkdir -p "$BIN_DIR"
   for bin in hmg hmg-server hmg-hook-worker; do
@@ -52,6 +53,21 @@ install_from_release() {
   return 0
 }
 
+install_from_release() {
+  target="$(target_triple)"
+  [ -n "$target" ] || return 1
+  asset="hmg-${target}.tar.gz"
+
+  for base_url in "$HMG_RELEASE_BASE_URL" "$GITHUB_RELEASE_BASE_URL"; do
+    [ -n "$base_url" ] || continue
+    if install_from_release_url "$asset" "$base_url"; then
+      return 0
+    fi
+  done
+
+  return 1
+}
+
 install_from_cargo() {
   if ! need_cmd cargo; then
     log "Cargo/Rust toolchain not found."
@@ -60,6 +76,7 @@ install_from_cargo() {
     return 1
   fi
 
+  log "No prebuilt HMG binary was found for this platform. Falling back to source install."
   log "Installing HMG from GitHub with cargo..."
   cargo_root="$TMP_DIR/cargo-root"
   CARGO_NET_GIT_FETCH_WITH_CLI=true cargo install --git "$GIT_URL" --root "$cargo_root" hmg-server --bins --force
