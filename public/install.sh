@@ -61,7 +61,7 @@ install_from_cargo() {
   fi
 
   log "Installing HMG from GitHub with cargo..."
-  cargo install --git "$GIT_URL" --package hmg-server --bins --force
+  cargo install --git "$GIT_URL" hmg-server --bins --force
 }
 
 main() {
