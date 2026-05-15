@@ -1,1 +1,1 @@
-2d376449fa10a513640cdcc9b21c7a1a08e27bc448c5f45f7b8268cf63da5d95  hmg-x86_64-unknown-linux-gnu.tar.gz
+306360d547ed56fc4c6de3e8e2cfdffd831d9d619b42b445998dbb0d5bb185fa  hmg-x86_64-unknown-linux-gnu.tar.gz
