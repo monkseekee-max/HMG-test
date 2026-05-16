@@ -404,19 +404,21 @@ const PRODUCT_DOC_TOPICS: [ProductDocTopic; 8] = [
         label: "08",
         title_zh: "命令行与 TUI 能力",
         title_en: "CLI and TUI capabilities",
-        summary_zh: "hmg CLI 正在从初始化脚本升级为稳定的本地控制面：初始化、更新、诊断、版本和轻量控制台都有明确命令。",
-        summary_en: "The hmg CLI is maturing from an initializer into a local control plane with explicit commands for init, update, diagnostics, versioning, and a lightweight console.",
+        summary_zh: "hmg CLI 正在从初始化脚本升级为稳定的本地控制面：初始化、更新、诊断、版本、轻量控制台和多 agent adapter 都有明确命令。",
+        summary_en: "The hmg CLI is maturing from an initializer into a local control plane with explicit commands for init, update, diagnostics, versioning, a lightweight console, and multi-agent adapters.",
         bullets_zh: &[
             "hmg --help / hmg version：基础可发现性。",
             "hmg init / hmg init -g：本地或全局注入自动记忆策略。",
             "hmg doctor / hmg tui：检查 server、Codex、AGENTS.md 和 MCP 配置状态。",
+            "hmg init --agent pi：生成 pi extension，把 HMG MCP 包装成 pi custom tools。",
         ],
         bullets_en: &[
             "hmg --help / hmg version: basic discoverability.",
             "hmg init / hmg init -g: install local or global autonomous memory policy.",
             "hmg doctor / hmg tui: inspect server, Codex, AGENTS.md, and MCP configuration readiness.",
+            "hmg init --agent pi: generate a pi extension that wraps HMG MCP as pi custom tools.",
         ],
-        code: "hmg --help\nhmg version\nhmg doctor\nhmg tui",
+        code: "hmg --help\nhmg version\nhmg init --agent pi\nhmg doctor --agent pi\nhmg tui",
     },
 ];
 
