@@ -39,7 +39,7 @@ supported_targets() {
   log "  hmg-aarch64-unknown-linux-gnu.tar.gz"
   log "  hmg-x86_64-apple-darwin.tar.gz"
   log "  hmg-aarch64-apple-darwin.tar.gz"
-  log "Windows PowerShell uses: hmg-x86_64-pc-windows-msvc.zip"
+  log "Windows PowerShell uses: hmg-x86_64-pc-windows-gnu.zip"
 }
 
 install_from_release_url() {

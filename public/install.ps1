@@ -27,15 +27,15 @@ function Need-Cmd([string] $Name) {
 function Target-Triple {
   $Arch = if ($env:PROCESSOR_ARCHITEW6432) { $env:PROCESSOR_ARCHITEW6432 } else { $env:PROCESSOR_ARCHITECTURE }
   switch ($Arch.ToUpperInvariant()) {
-    "AMD64" { return "x86_64-pc-windows-msvc" }
-    "ARM64" { return "aarch64-pc-windows-msvc" }
+    "AMD64" { return "x86_64-pc-windows-gnu" }
+    "ARM64" { return "" }
     default { return "" }
   }
 }
 
 function Supported-Targets {
   Log "Supported Windows prebuilt packages:"
-  Log "  hmg-x86_64-pc-windows-msvc.zip"
+  Log "  hmg-x86_64-pc-windows-gnu.zip"
   Log "Windows ARM64 currently falls back to source install until an ARM64 zip is published."
 }
 
