@@ -37,8 +37,8 @@ supported_targets() {
   log "Supported prebuilt packages:"
   log "  hmg-x86_64-unknown-linux-gnu.tar.gz"
   log "  hmg-aarch64-unknown-linux-gnu.tar.gz"
-  log "  hmg-x86_64-apple-darwin.tar.gz"
   log "  hmg-aarch64-apple-darwin.tar.gz"
+  log "Intel macOS currently falls back to source install until an x86_64 package is published."
   log "Windows PowerShell uses: hmg-x86_64-pc-windows-gnu.zip"
 }
 
