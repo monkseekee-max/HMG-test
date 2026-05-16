@@ -126,7 +126,7 @@ function Install-From-Cargo {
   if (-not (Need-Cmd "cargo")) {
     Log "Cargo/Rust toolchain not found."
     Log "Install Rust first: https://rustup.rs/"
-    Log "Then rerun: powershell -NoProfile -ExecutionPolicy Bypass -Command \"irm https://funcode.xin/HMG/install.ps1 | iex\""
+    Log "Then rerun: powershell -NoProfile -ExecutionPolicy Bypass -Command \"[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; iex ((New-Object Net.WebClient).DownloadString('https://funcode.xin/HMG/install.ps1'))\""
     exit 1
   }
 
