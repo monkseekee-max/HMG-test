@@ -4,6 +4,7 @@ $ErrorActionPreference = "Stop"
 $Repo = "monkseekee-max/HMG"
 $GitUrl = "https://github.com/$Repo.git"
 $ReleaseBaseUrl = if ($env:HMG_RELEASE_BASE_URL) { $env:HMG_RELEASE_BASE_URL } else { "https://funcode.xin/HMG/releases/latest/download" }
+$PublicReleaseBaseUrl = if ($env:HMG_PUBLIC_RELEASE_BASE_URL) { $env:HMG_PUBLIC_RELEASE_BASE_URL } else { "https://raw.githubusercontent.com/monkseekee-max/HMG-test/main/public/releases/latest/download" }
 $GitHubReleaseBaseUrl = "https://github.com/$Repo/releases/latest/download"
 $BinDir = if ($env:HMG_INSTALL_DIR) {
   $env:HMG_INSTALL_DIR
@@ -110,7 +111,7 @@ function Install-From-Release {
   $Asset = "hmg-$Target.zip"
   Log "Detected platform: Windows/$env:PROCESSOR_ARCHITECTURE -> $Target"
 
-  foreach ($BaseUrl in @($ReleaseBaseUrl, $GitHubReleaseBaseUrl)) {
+  foreach ($BaseUrl in @($ReleaseBaseUrl, $PublicReleaseBaseUrl, $GitHubReleaseBaseUrl)) {
     if ($BaseUrl -and (Install-From-Release-Url $Asset $BaseUrl)) {
       return $true
     }

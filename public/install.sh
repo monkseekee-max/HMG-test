@@ -4,6 +4,7 @@ set -eu
 REPO="monkseekee-max/HMG"
 GIT_URL="https://github.com/${REPO}.git"
 HMG_RELEASE_BASE_URL="${HMG_RELEASE_BASE_URL:-https://funcode.xin/HMG/releases/latest/download}"
+PUBLIC_RELEASE_BASE_URL="${HMG_PUBLIC_RELEASE_BASE_URL:-https://raw.githubusercontent.com/monkseekee-max/HMG-test/main/public/releases/latest/download}"
 GITHUB_RELEASE_BASE_URL="https://github.com/${REPO}/releases/latest/download"
 BIN_DIR="${HMG_INSTALL_DIR:-$HOME/.local/bin}"
 TMP_DIR="$(mktemp -d 2>/dev/null || mktemp -d -t hmg-install)"
@@ -89,7 +90,7 @@ install_from_release() {
   asset="hmg-${target}.tar.gz"
   log "Detected platform: $os/$arch -> $target"
 
-  for base_url in "$HMG_RELEASE_BASE_URL" "$GITHUB_RELEASE_BASE_URL"; do
+  for base_url in "$HMG_RELEASE_BASE_URL" "$PUBLIC_RELEASE_BASE_URL" "$GITHUB_RELEASE_BASE_URL"; do
     [ -n "$base_url" ] || continue
     if install_from_release_url "$asset" "$base_url"; then
       return 0
