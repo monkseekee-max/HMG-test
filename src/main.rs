@@ -247,7 +247,12 @@ const MEMORY_LAYERS: [MemoryLayer; 4] = [
     },
 ];
 
-const QUICKSTART_CODE: &str = r#"curl -fsSL https://funcode.xin/HMG/install.sh | sh
+const QUICKSTART_CODE: &str = r#"# macOS / Linux
+curl -fsSL https://funcode.xin/HMG/install.sh | sh
+
+# Windows PowerShell
+powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://funcode.xin/HMG/install.ps1 | iex"
+
 hmg init -g
 hmg doctor
 codex"#;
@@ -267,15 +272,19 @@ const PRODUCT_DOC_TOPICS: [ProductDocTopic; 8] = [
         label: "01",
         title_zh: "安装与初始化",
         title_en: "Install and initialize",
-        summary_zh: "HMG 官网安装脚本会优先下载 funcode.xin 托管的预编译二进制；如果当前平台还没有预编译包，才回退到源码安装。",
-        summary_en: "The HMG installer prefers prebuilt binaries hosted on funcode.xin and only falls back to source installation when a platform package is unavailable.",
+        summary_zh: "HMG 官网安装脚本会按系统与 CPU 自动选择预编译二进制：macOS / Linux 使用 install.sh，Windows 使用 install.ps1；没有匹配包时才回退到源码安装。",
+        summary_en: "The HMG installer auto-selects prebuilt binaries by OS and CPU: macOS / Linux use install.sh, Windows uses install.ps1, and source install is only a fallback.",
         bullets_zh: &[
+            "macOS / Linux：curl -fsSL https://funcode.xin/HMG/install.sh | sh。",
+            "Windows PowerShell：powershell -NoProfile -ExecutionPolicy Bypass -Command \"irm https://funcode.xin/HMG/install.ps1 | iex\"。",
             "安装后会提供 hmg、hmg-server、hmg-hook-worker 三个命令。",
             "hmg init 在当前目录 AGENTS.md 头部写入 HMG 自动记忆策略。",
             "hmg init -g 写入 ~/.codex/AGENTS.md，并自动配置 ~/.codex/config.toml 的 HMG MCP。",
             "hmg doctor 用于验证命令、全局策略和 Codex MCP 配置是否就绪。",
         ],
         bullets_en: &[
+            "macOS / Linux: curl -fsSL https://funcode.xin/HMG/install.sh | sh.",
+            "Windows PowerShell: powershell -NoProfile -ExecutionPolicy Bypass -Command \"irm https://funcode.xin/HMG/install.ps1 | iex\".",
             "Installation provides hmg, hmg-server, and hmg-hook-worker.",
             "hmg init writes the HMG memory policy into the current AGENTS.md.",
             "hmg init -g writes ~/.codex/AGENTS.md and automatically configures HMG MCP in ~/.codex/config.toml.",
@@ -385,8 +394,8 @@ const PRODUCT_DOC_TOPICS: [ProductDocTopic; 8] = [
         label: "07",
         title_zh: "发布与更新路径",
         title_en: "Release and update path",
-        summary_zh: "更新不再要求用户复制 cargo install 命令；统一使用 hmg update。它默认走官网 install.sh，未来有 release 二进制时会自动优先下载。",
-        summary_en: "Updates no longer require users to copy cargo install commands; use hmg update. It defaults to the website installer and will prefer release binaries when they are available.",
+        summary_zh: "更新不再要求用户复制 cargo install 命令；统一使用 hmg update。macOS / Linux 会走官网 install.sh，Windows 会走官网 install.ps1，并优先下载对应 release 二进制。",
+        summary_en: "Updates no longer require users to copy cargo install commands; use hmg update. macOS / Linux use install.sh, Windows uses install.ps1, and matching release binaries are preferred.",
         bullets_zh: &[
             "日常更新：hmg update。",
             "验证更新：hmg doctor。",
@@ -462,7 +471,7 @@ fn copy(lang: Lang) -> SiteCopy {
             trust_audit_body: "有用的交接应该带上来源、验证、信心、风险，以及塑造它的决策。",
             quickstart_kicker: "快速开始",
             quickstart_title: "一条命令安装，下一条命令让 Codex 自动记忆。",
-            quickstart_body: "官网安装脚本会优先下载 funcode.xin 托管的 release 二进制；随后用 hmg init -g 同时写入全局 Codex 记忆策略和 MCP 配置。",
+            quickstart_body: "官网安装脚本会按系统与 CPU 自动选择 release 二进制：macOS / Linux 使用 install.sh，Windows 使用 install.ps1；随后用 hmg init -g 同时写入全局 Codex 记忆策略和 MCP 配置。",
             quickstart_code_label: "HMG 安装命令",
             final_kicker: "给正在用 agent 交付软件的团队",
             final_title: "把你希望上一次会话保留下来的上下文，交给下一次会话。",
@@ -503,7 +512,7 @@ fn copy(lang: Lang) -> SiteCopy {
             trust_audit_body: "Every useful handoff carries source, validation, confidence, risk, and the decision that shaped it.",
             quickstart_kicker: "Quickstart",
             quickstart_title: "Install with one command. Let Codex remember with the next one.",
-            quickstart_body: "The installer prefers release binaries hosted on funcode.xin. Then hmg init -g writes both the global Codex memory policy and MCP config.",
+            quickstart_body: "The installer auto-selects release binaries by OS and CPU: macOS / Linux use install.sh, Windows uses install.ps1. Then hmg init -g writes both the global Codex memory policy and MCP config.",
             quickstart_code_label: "HMG install command",
             final_kicker: "For builders shipping with agents",
             final_title: "Give the next session the context you wish the last one had kept.",

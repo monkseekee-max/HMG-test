@@ -33,30 +33,61 @@ target_triple() {
   esac
 }
 
+supported_targets() {
+  log "Supported prebuilt packages:"
+  log "  hmg-x86_64-unknown-linux-gnu.tar.gz"
+  log "  hmg-aarch64-unknown-linux-gnu.tar.gz"
+  log "  hmg-x86_64-apple-darwin.tar.gz"
+  log "  hmg-aarch64-apple-darwin.tar.gz"
+  log "Windows PowerShell uses: hmg-x86_64-pc-windows-msvc.zip"
+}
+
 install_from_release_url() {
   asset="$1"
   base_url="$2"
-  url="${base_url}/${asset}"
-  if ! curl -fsI "$url" >/dev/null 2>&1; then
+  url="${base_url%/}/${asset}"
+  package_dir="$TMP_DIR/package"
+
+  rm -rf "$package_dir"
+  mkdir -p "$package_dir"
+
+  log "Trying HMG release: $url"
+  if ! curl -fL --retry 3 --retry-delay 1 --connect-timeout 20 "$url" -o "$TMP_DIR/$asset"; then
+    log "Release unavailable or download failed: $url"
     return 1
   fi
 
-  log "Downloading HMG release: $url"
-  curl -fL --retry 3 --retry-delay 1 "$url" -o "$TMP_DIR/$asset"
-  tar -xzf "$TMP_DIR/$asset" -C "$TMP_DIR"
+  if ! tar -xzf "$TMP_DIR/$asset" -C "$package_dir"; then
+    log "Downloaded release is not a valid tar.gz package: $url"
+    return 1
+  fi
+
+  for bin in hmg hmg-server hmg-hook-worker; do
+    if [ ! -f "$package_dir/$bin" ]; then
+      log "Release package is missing required binary: $bin"
+      return 1
+    fi
+  done
+
   mkdir -p "$BIN_DIR"
   for bin in hmg hmg-server hmg-hook-worker; do
-    if [ -f "$TMP_DIR/$bin" ]; then
-      install -m 0755 "$TMP_DIR/$bin" "$BIN_DIR/$bin"
-    fi
+    install -m 0755 "$package_dir/$bin" "$BIN_DIR/$bin"
   done
   return 0
 }
 
 install_from_release() {
+  os="$(uname -s 2>/dev/null || echo unknown)"
+  arch="$(uname -m 2>/dev/null || echo unknown)"
   target="$(target_triple)"
-  [ -n "$target" ] || return 1
+  if [ -z "$target" ]; then
+    log "Unsupported platform for prebuilt install: $os/$arch"
+    supported_targets
+    return 1
+  fi
+
   asset="hmg-${target}.tar.gz"
+  log "Detected platform: $os/$arch -> $target"
 
   for base_url in "$HMG_RELEASE_BASE_URL" "$GITHUB_RELEASE_BASE_URL"; do
     [ -n "$base_url" ] || continue
@@ -65,6 +96,8 @@ install_from_release() {
     fi
   done
 
+  log "No prebuilt HMG release package found for $target."
+  supported_targets
   return 1
 }
 

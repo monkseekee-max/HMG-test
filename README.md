@@ -20,3 +20,19 @@ env -u NO_COLOR trunk build --release
 ```
 
 `env -u NO_COLOR` works around Trunk 0.21 parsing `NO_COLOR=1` as an invalid boolean.
+
+## Install Commands
+
+macOS / Linux:
+
+```bash
+curl -fsSL https://funcode.xin/HMG/install.sh | sh
+```
+
+Windows PowerShell:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://funcode.xin/HMG/install.ps1 | iex"
+```
+
+The website copies both `public/install.sh` and `public/install.ps1` into the published root so `https://funcode.xin/HMG/install.sh` and `https://funcode.xin/HMG/install.ps1` stay in sync.
