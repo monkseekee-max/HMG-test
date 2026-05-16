@@ -410,15 +410,19 @@ const PRODUCT_DOC_TOPICS: [ProductDocTopic; 8] = [
             "hmg --help / hmg version：基础可发现性。",
             "hmg init / hmg init -g：本地或全局注入自动记忆策略。",
             "hmg doctor / hmg tui：检查 server、Codex、AGENTS.md 和 MCP 配置状态。",
+            "hmg integrations list：查看 codex、cursor、claude、pi、generic-mcp adapter。",
+            "hmg init --agent cursor / claude：写入项目级 MCP JSON 和自动记忆指令。",
             "hmg init --agent pi：生成 pi extension，把 HMG MCP 包装成 pi custom tools。",
         ],
         bullets_en: &[
             "hmg --help / hmg version: basic discoverability.",
             "hmg init / hmg init -g: install local or global autonomous memory policy.",
             "hmg doctor / hmg tui: inspect server, Codex, AGENTS.md, and MCP configuration readiness.",
+            "hmg integrations list: discover codex, cursor, claude, pi, and generic-mcp adapters.",
+            "hmg init --agent cursor / claude: write project-level MCP JSON and memory instructions.",
             "hmg init --agent pi: generate a pi extension that wraps HMG MCP as pi custom tools.",
         ],
-        code: "hmg --help\nhmg version\nhmg init --agent pi\nhmg doctor --agent pi\nhmg tui",
+        code: "hmg --help\nhmg integrations list\nhmg init --agent cursor\nhmg init --agent claude\nhmg init --agent pi\nhmg doctor --all-agents\nhmg tui",
     },
 ];
 
