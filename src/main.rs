@@ -251,7 +251,7 @@ const QUICKSTART_CODE: &str = r#"# macOS / Linux
 curl -fsSL https://funcode.xin/HMG/install.sh | sh
 
 # Windows PowerShell
-powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; iex ((New-Object Net.WebClient).DownloadString('https://funcode.xin/HMG/install.ps1'))"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "iex ((New-Object Net.WebClient).DownloadString('http://funcode.xin/HMG/install.ps1'))"
 
 hmg init -g
 hmg doctor
@@ -276,7 +276,7 @@ const PRODUCT_DOC_TOPICS: [ProductDocTopic; 8] = [
         summary_en: "The HMG installer auto-selects prebuilt binaries by OS and CPU: macOS / Linux use install.sh, Windows uses install.ps1, and source install is only a fallback.",
         bullets_zh: &[
             "macOS / Linux：curl -fsSL https://funcode.xin/HMG/install.sh | sh。",
-            "Windows PowerShell：powershell -NoProfile -ExecutionPolicy Bypass -Command \"[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; iex ((New-Object Net.WebClient).DownloadString('https://funcode.xin/HMG/install.ps1'))\"。",
+            "Windows PowerShell：powershell -NoProfile -ExecutionPolicy Bypass -Command \"iex ((New-Object Net.WebClient).DownloadString('http://funcode.xin/HMG/install.ps1'))\"。",
             "安装后会提供 hmg、hmg-server、hmg-hook-worker 三个命令。",
             "hmg init 在当前目录 AGENTS.md 头部写入 HMG 自动记忆策略。",
             "hmg init -g 写入 ~/.codex/AGENTS.md，并自动配置 ~/.codex/config.toml 的 HMG MCP。",
@@ -284,7 +284,7 @@ const PRODUCT_DOC_TOPICS: [ProductDocTopic; 8] = [
         ],
         bullets_en: &[
             "macOS / Linux: curl -fsSL https://funcode.xin/HMG/install.sh | sh.",
-            "Windows PowerShell: powershell -NoProfile -ExecutionPolicy Bypass -Command \"[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; iex ((New-Object Net.WebClient).DownloadString('https://funcode.xin/HMG/install.ps1'))\".",
+            "Windows PowerShell: powershell -NoProfile -ExecutionPolicy Bypass -Command \"iex ((New-Object Net.WebClient).DownloadString('http://funcode.xin/HMG/install.ps1'))\".",
             "Installation provides hmg, hmg-server, and hmg-hook-worker.",
             "hmg init writes the HMG memory policy into the current AGENTS.md.",
             "hmg init -g writes ~/.codex/AGENTS.md and automatically configures HMG MCP in ~/.codex/config.toml.",

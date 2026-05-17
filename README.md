@@ -32,9 +32,9 @@ curl -fsSL https://funcode.xin/HMG/install.sh | sh
 Windows PowerShell:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; iex ((New-Object Net.WebClient).DownloadString('https://funcode.xin/HMG/install.ps1'))"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "iex ((New-Object Net.WebClient).DownloadString('http://funcode.xin/HMG/install.ps1'))"
 ```
 
-The Windows command explicitly enables TLS 1.2 before downloading the installer for Windows PowerShell 5.1 compatibility.
+The Windows command uses the HTTP bootstrap endpoint because some Windows PowerShell 5.1 environments fail before downloading the HTTPS script. The script still enables TLS 1.2 for HTTPS fallback mirrors.
 
-The website copies both `public/install.sh` and `public/install.ps1` into the published root so `https://funcode.xin/HMG/install.sh` and `https://funcode.xin/HMG/install.ps1` stay in sync.
+The website copies both `public/install.sh` and `public/install.ps1` into the published root so the HTTPS macOS/Linux installer and HTTP Windows bootstrap endpoint stay in sync.
