@@ -109,6 +109,114 @@ function Download-File([string] $Url, [string] $OutputPath) {
   throw $LastError
 }
 
+function PowerShell-Command {
+  if (Need-Cmd "pwsh") {
+    return "pwsh"
+  }
+  return "powershell"
+}
+
+function Try-Copy-Hmg-Binaries([string] $SourceDir, [string] $TargetDir, [string[]] $Bins) {
+  try {
+    foreach ($Bin in $Bins) {
+      Copy-Item -Force (Join-Path $SourceDir $Bin) (Join-Path $TargetDir $Bin)
+    }
+    return $true
+  } catch {
+    $script:LastBinaryCopyError = $_.Exception.Message
+    return $false
+  }
+}
+
+function Schedule-Deferred-Binary-Install([string] $SourceDir, [string] $TargetDir, [string[]] $Bins) {
+  $DeferredRoot = Join-Path ([IO.Path]::GetTempPath()) ("hmg-deferred-install-" + [Guid]::NewGuid().ToString("N"))
+  $DeferredPackageDir = Join-Path $DeferredRoot "package"
+  $HelperPath = Join-Path $DeferredRoot "finish-hmg-update.ps1"
+  $LogPath = Join-Path $DeferredRoot "finish-hmg-update.log"
+
+  New-Item -ItemType Directory -Force $DeferredPackageDir | Out-Null
+  foreach ($Bin in $Bins) {
+    Copy-Item -Force (Join-Path $SourceDir $Bin) (Join-Path $DeferredPackageDir $Bin)
+  }
+
+  $HelperScript = @'
+param(
+  [Parameter(Mandatory = $true)][string] $PackageDir,
+  [Parameter(Mandatory = $true)][string] $BinDir,
+  [Parameter(Mandatory = $true)][string] $BinsCsv,
+  [Parameter(Mandatory = $true)][string] $LogPath
+)
+
+$ErrorActionPreference = "Stop"
+$RequiredBins = $BinsCsv -split "\|"
+$Deadline = (Get-Date).AddMinutes(3)
+$LastErrorMessage = ""
+
+function Append-Log([string] $Message) {
+  $Timestamp = (Get-Date).ToString("s")
+  Add-Content -Path $LogPath -Value "[$Timestamp] $Message"
+}
+
+function Try-Copy-Bins {
+  try {
+    foreach ($Bin in $RequiredBins) {
+      Copy-Item -Force (Join-Path $PackageDir $Bin) (Join-Path $BinDir $Bin)
+    }
+    return $true
+  } catch {
+    $script:LastErrorMessage = $_.Exception.Message
+    return $false
+  }
+}
+
+Append-Log "Waiting for HMG binaries to be released before finishing update."
+while ((Get-Date) -lt $Deadline) {
+  if (Try-Copy-Bins) {
+    Append-Log "HMG deferred update completed successfully."
+    try { Remove-Item -Recurse -Force $PackageDir } catch {}
+    exit 0
+  }
+  Start-Sleep -Milliseconds 500
+}
+
+Append-Log "Timed out while replacing HMG binaries: $LastErrorMessage"
+exit 1
+'@
+
+  Set-Content -Path $HelperPath -Value $HelperScript -Encoding UTF8
+
+  $PowerShell = PowerShell-Command
+  Start-Process -FilePath $PowerShell -WindowStyle Hidden -ArgumentList @(
+    "-NoProfile",
+    "-ExecutionPolicy",
+    "Bypass",
+    "-File",
+    $HelperPath,
+    "-PackageDir",
+    $DeferredPackageDir,
+    "-BinDir",
+    $TargetDir,
+    "-BinsCsv",
+    ($Bins -join "|"),
+    "-LogPath",
+    $LogPath
+  ) | Out-Null
+
+  Log "HMG binaries are currently in use, so the update will finish in the background after this command exits."
+  Log "Deferred update log: $LogPath"
+  return $true
+}
+
+function Install-Hmg-Binaries([string] $SourceDir, [string] $TargetDir, [string[]] $Bins) {
+  New-Item -ItemType Directory -Force $TargetDir | Out-Null
+  if (Try-Copy-Hmg-Binaries $SourceDir $TargetDir $Bins) {
+    return $true
+  }
+
+  Log "Could not replace HMG binaries immediately: $script:LastBinaryCopyError"
+  return Schedule-Deferred-Binary-Install $SourceDir $TargetDir $Bins
+}
+
 function Install-From-Release-Url([string] $Asset, [string] $BaseUrl) {
   $Url = $BaseUrl.TrimEnd("/") + "/" + $Asset
   $ArchivePath = Join-Path $TempDir $Asset
@@ -142,11 +250,7 @@ function Install-From-Release-Url([string] $Asset, [string] $BaseUrl) {
     }
   }
 
-  New-Item -ItemType Directory -Force $BinDir | Out-Null
-  foreach ($Bin in $RequiredBins) {
-    Copy-Item -Force (Join-Path $PackageDir $Bin) (Join-Path $BinDir $Bin)
-  }
-  return $true
+  return Install-Hmg-Binaries $PackageDir $BinDir $RequiredBins
 }
 
 function Install-From-Release {
@@ -189,12 +293,15 @@ function Install-From-Cargo {
     throw "cargo install failed with exit code $LASTEXITCODE"
   }
 
-  New-Item -ItemType Directory -Force $BinDir | Out-Null
+  $CargoBinDir = Join-Path $CargoRoot "bin"
+  $AvailableBins = @()
   foreach ($Bin in @("hmg.exe", "hmg-server.exe", "hmg-hook-worker.exe")) {
-    $Source = Join-Path (Join-Path $CargoRoot "bin") $Bin
-    if (Test-Path $Source) {
-      Copy-Item -Force $Source (Join-Path $BinDir $Bin)
+    if (Test-Path (Join-Path $CargoBinDir $Bin)) {
+      $AvailableBins += $Bin
     }
+  }
+  if ($AvailableBins.Count -gt 0) {
+    Install-Hmg-Binaries $CargoBinDir $BinDir $AvailableBins | Out-Null
   }
 }
 
