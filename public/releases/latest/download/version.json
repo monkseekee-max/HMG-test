@@ -1,0 +1,12 @@
+{
+  "manifest_version": 1,
+  "version": "0.2.2",
+  "tag": "v0.2.2",
+  "released_at": "2026-05-17T07:23:25Z",
+  "channel": "stable",
+  "severity": "normal",
+  "title": "HMG v0.2.2 available",
+  "message": "Run hmg update to install the latest HMG release.",
+  "update_command": "hmg update",
+  "sha256sums_url": "https://funcode.xin/HMG/releases/latest/download/SHA256SUMS.txt"
+}
