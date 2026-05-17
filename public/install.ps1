@@ -25,6 +25,55 @@ function Need-Cmd([string] $Name) {
   return [bool] (Get-Command $Name -ErrorAction SilentlyContinue)
 }
 
+function Normalize-PathEntry([string] $Entry) {
+  if ([string]::IsNullOrWhiteSpace($Entry)) {
+    return ""
+  }
+
+  $Expanded = [Environment]::ExpandEnvironmentVariables($Entry.Trim())
+  try {
+    return [IO.Path]::GetFullPath($Expanded).TrimEnd([char[]]@('\', '/'))
+  } catch {
+    return $Expanded.TrimEnd([char[]]@('\', '/'))
+  }
+}
+
+function Path-Contains([string] $PathValue, [string] $Entry) {
+  $NormalizedEntry = Normalize-PathEntry $Entry
+  foreach ($PathPart in ($PathValue -split ";")) {
+    if ((Normalize-PathEntry $PathPart).Equals($NormalizedEntry, [StringComparison]::OrdinalIgnoreCase)) {
+      return $true
+    }
+  }
+  return $false
+}
+
+function Add-Hmg-To-Path {
+  $NormalizedBinDir = Normalize-PathEntry $BinDir
+  $UserPath = [Environment]::GetEnvironmentVariable("Path", "User")
+
+  if (-not (Path-Contains $UserPath $NormalizedBinDir)) {
+    $NewUserPath = if ([string]::IsNullOrWhiteSpace($UserPath)) {
+      $NormalizedBinDir
+    } else {
+      $UserPath.TrimEnd([char[]]@(';')) + ";" + $NormalizedBinDir
+    }
+    [Environment]::SetEnvironmentVariable("Path", $NewUserPath, "User")
+    Log "Added HMG bin directory to your user PATH."
+  } else {
+    Log "HMG bin directory is already in your user PATH."
+  }
+
+  if (-not (Path-Contains $env:Path $NormalizedBinDir)) {
+    $env:Path = if ([string]::IsNullOrWhiteSpace($env:Path)) {
+      $NormalizedBinDir
+    } else {
+      $env:Path.TrimEnd([char[]]@(';')) + ";" + $NormalizedBinDir
+    }
+    Log "Added HMG bin directory to this PowerShell process PATH."
+  }
+}
+
 function Target-Triple {
   $Arch = if ($env:PROCESSOR_ARCHITEW6432) { $env:PROCESSOR_ARCHITEW6432 } else { $env:PROCESSOR_ARCHITECTURE }
   switch ($Arch.ToUpperInvariant()) {
@@ -126,7 +175,7 @@ function Install-From-Cargo {
   if (-not (Need-Cmd "cargo")) {
     Log "Cargo/Rust toolchain not found."
     Log "Install Rust first: https://rustup.rs/"
-    Log "Then rerun: powershell -NoProfile -ExecutionPolicy Bypass -Command \"iex ((New-Object Net.WebClient).DownloadString('http://120.27.148.29/HMG/install.ps1'))\""
+    Log "Then rerun in PowerShell: iex ((New-Object Net.WebClient).DownloadString('http://120.27.148.29/HMG/install.ps1'))"
     exit 1
   }
 
@@ -156,12 +205,13 @@ try {
   }
 
   Log ""
-  Log "HMG installed."
-  Log "If hmg is not found, add this directory to your user PATH:"
+  Add-Hmg-To-Path
+  Log ""
+  Log "HMG installed to:"
   Log "  $BinDir"
   Log ""
-  Log "PowerShell PATH helper:"
-  Log "  [Environment]::SetEnvironmentVariable('Path', [Environment]::GetEnvironmentVariable('Path', 'User') + ';$BinDir', 'User')"
+  Log "If this PowerShell window still cannot find hmg, refresh this window with:"
+  Log "  `$env:Path += ';$BinDir'"
   Log ""
   Log "Next steps:"
   Log "  hmg init -g"
