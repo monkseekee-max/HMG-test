@@ -1,4 +1,4 @@
-614fb474313e8eccd3e604406ec90b907cb4afac4ba6585b7c6eecd105830027  hmg-aarch64-apple-darwin.tar.gz
-bc2eabb064bb5f51e68b74b9c9b6f5df12b1ae6a1216778e2e09ac34a4122ddd  hmg-aarch64-unknown-linux-gnu.tar.gz
-9561da5736c2bda58d45fce6049b426cbe9e685dcc05d153c4b78b159bd6aaac  hmg-x86_64-pc-windows-gnu.zip
-ee95b8124beac8e513dff797a5d64a661ef985a31d592a59eb55c985569e35e8  hmg-x86_64-unknown-linux-gnu.tar.gz
+41d106ea21883fa0968d330021086ad07f0a554a8080f64b416fd9c5672d7cf8  hmg-aarch64-apple-darwin.tar.gz
+eb4be1adcfe5fbf09bdf707383f325c9cbb143b3e5da09581cf57cf364425b70  hmg-aarch64-unknown-linux-gnu.tar.gz
+91dd474129e369ac2b5a7f897b21d11c8c4e9364ea2a0e2918142fa2029cd6ed  hmg-x86_64-pc-windows-gnu.zip
+9f4c57b2e7ac337ed8eb3969e1bb3981e0c9694126ef7b235ed98c480728a333  hmg-x86_64-unknown-linux-gnu.tar.gz
