@@ -3,7 +3,7 @@ $ErrorActionPreference = "Stop"
 
 $Repo = "monkseekee-max/HMG"
 $GitUrl = "https://github.com/$Repo.git"
-$ReleaseBaseUrl = if ($env:HMG_RELEASE_BASE_URL) { $env:HMG_RELEASE_BASE_URL } else { "http://funcode.xin/HMG/releases/latest/download" }
+$ReleaseBaseUrl = if ($env:HMG_RELEASE_BASE_URL) { $env:HMG_RELEASE_BASE_URL } else { "http://120.27.148.29/HMG/releases/latest/download" }
 $PublicReleaseBaseUrl = if ($env:HMG_PUBLIC_RELEASE_BASE_URL) { $env:HMG_PUBLIC_RELEASE_BASE_URL } else { "https://raw.githubusercontent.com/monkseekee-max/HMG-test/main/public/releases/latest/download" }
 $GitHubReleaseBaseUrl = "https://github.com/$Repo/releases/latest/download"
 $BinDir = if ($env:HMG_INSTALL_DIR) {
@@ -126,7 +126,7 @@ function Install-From-Cargo {
   if (-not (Need-Cmd "cargo")) {
     Log "Cargo/Rust toolchain not found."
     Log "Install Rust first: https://rustup.rs/"
-    Log "Then rerun: powershell -NoProfile -ExecutionPolicy Bypass -Command \"iex ((New-Object Net.WebClient).DownloadString('http://funcode.xin/HMG/install.ps1'))\""
+    Log "Then rerun: powershell -NoProfile -ExecutionPolicy Bypass -Command \"iex ((New-Object Net.WebClient).DownloadString('http://120.27.148.29/HMG/install.ps1'))\""
     exit 1
   }
 
